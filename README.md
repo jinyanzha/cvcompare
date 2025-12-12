@@ -1,16 +1,16 @@
 
 
-# cvcompare
+# cvstrategy
 
 ## Overview
 
-`cvcompare` is an R package designed to compare multiple cross-validation
+`cvstrategy` is an R package designed to compare multiple cross-validation
 strategies for L1-regularized logistic regression.  
 The package provides a unified framework for evaluating predictive
 performance, computational efficiency, and stability of different
 cross-validation schemes.
 
-Specifically, `cvcompare` implements and compares four approaches:
+Specifically, `cvstrategy` implements and compares four approaches:
 basic cross-validation, warm-start cross-validation, adaptive
 coarse-to-fine search, and the official `cv.glmnet` procedure.
 
@@ -22,7 +22,7 @@ coarse-to-fine search, and the official `cv.glmnet` procedure.
 
 ## Features
 
-`cvcompare` provides the following functionality:
+`cvstrategy` provides the following functionality:
 
 - Compare four cross-validation strategies for L1-regularized logistic regression:
   - Basic CV (cold start)
@@ -54,8 +54,8 @@ coarse-to-fine search, and the official `cv.glmnet` procedure.
 # Install devtools if not already installed
 install.packages("devtools")
 
-# Install cvcompare from GitHub
-devtools::install_github("jinyanzha/cvcompare")
+# Install cvstrategy from GitHub
+devtools::install_github("jinyanzha/cvstrategy")
 ```
 
 
@@ -84,23 +84,66 @@ print(tab)
 
 ## Function Details
 
-- Input Parameters:
+### Input Parameters
 
-  - `Y`: The response variable (character string representing the column name in `data`).
-  - `X`: Predictor variables(eg.,"X1+X2")
-  - `data`: A data frame that contains both `Y` and `X` variables.
-  
+- `X`  
+  A numeric design matrix of predictors (n × p).
 
-- Output:
-  - model metrics including R-squared, Adjusted R-squared, F-statistic and p-values.
-  - Residuals Table: A table summarizing residuals (`Min`, `1Q`, `Median`, `3Q`, `Max`).
-  - Regression Table: A table containing coefficients, standard errors, t-values, and relevant p-values.
-  - Confidence Interval: A table containing all coefficients' confidence interval
+- `y`  
+  A binary response vector coded as 0/1.
 
+- `lambda_path`  
+  Optional numeric vector specifying the regularization path.  
+  If `NULL`, a default path is generated internally.
+
+- `K`  
+  Number of cross-validation folds.
+
+- `foldid`  
+  Optional vector assigning observations to folds.
+
+- `seed`  
+  Random seed for reproducibility.
+
+- `n_lambda_coarse`  
+  Number of coarse grid points for adaptive CV.
+
+- `n_lambda_fine`  
+  Number of fine grid points for adaptive CV.
+
+- `threshold`  
+  Classification threshold used for accuracy calculation.
+
+---
+
+### Output
+
+The function returns a `data.frame` comparing four cross-validation strategies:
+
+- **basic**: standard cross-validation  
+- **warm**: warm-start cross-validation  
+- **adaptive**: coarse-to-fine adaptive search  
+- **official**: `cv.glmnet` baseline  
+
+For each method, the following metrics are reported:
+
+- `best_lambda`  
+- `best_cvm` (minimum cross-validation deviance)  
+- `train_mse`  
+- `accuracy`  
+- `auc`  
+- `stability_sd_best`  
+- `stability_mean_sd`  
+- `runtime` (in seconds)
+
+---
 
 ## Interpretation of Output
-- The R-squared value represents the proportion of the variance explained by the model.
-- The Adjusted R-squared accounts for the number of predictors in the model, providing a better measure for models with multiple predictors.
-- The F-statistic tests whether the overall regression model is a good fit for the data.
-- Residual standard error provides a measure of the typical size of residuals.
-- Confidence Interval provide a range within which we expect the true value of the regression coefficient to lie, with a certain level of confidence, in this case, 95%.
+
+- The **cross-validation deviance** reflects predictive performance on held-out data.
+- **Accuracy** and **AUC** evaluate classification performance.
+- **Stability metrics** quantify the sensitivity of coefficient estimates across folds.
+- **Runtime** highlights computational efficiency differences among CV strategies.
+
+Lower CV error and higher stability indicate more reliable model selection.
+
