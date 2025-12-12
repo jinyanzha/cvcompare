@@ -54,6 +54,10 @@ coarse-to-fine search, and the official `cv.glmnet` procedure.
 
 ---
 
+
+
+
+
 ## Installation
 
 ```r
@@ -88,68 +92,70 @@ print(tab)
   
 ```
 
-## Function Details
+## Main Functions
 
-### Input Parameters
+### `compare_cv_methods()`
 
-- `X`  
-  A numeric design matrix of predictors (n × p).
+**Description**  
+The core function of the package.  
+It compares multiple cross-validation strategies for L1-regularized logistic
+regression and returns a unified summary table.
 
-- `y`  
-  A binary response vector coded as 0/1.
+**Purpose**
 
-- `lambda_path`  
-  Optional numeric vector specifying the regularization path.  
-  If `NULL`, a default path is generated internally.
+- Compare multiple cross-validation strategies in a single framework  
+- Evaluate predictive performance, stability, and computational efficiency  
+- Provide a reproducible benchmark for model selection  
 
-- `K`  
-  Number of cross-validation folds.
+**Key Inputs**
 
-- `foldid`  
-  Optional vector assigning observations to folds.
+- `X`: Numeric design matrix of predictors (n × p)
+- `y`: Binary response vector coded as 0/1
+- `K`: Number of cross-validation folds
+- `seed`: Random seed for reproducibility
+- `lambda_path`: Optional regularization path
+- `n_lambda_coarse`: Number of coarse grid points (adaptive CV)
+- `n_lambda_fine`: Number of fine grid points (adaptive CV)
+- `threshold`: Classification threshold for accuracy
 
-- `seed`  
-  Random seed for reproducibility.
+**Output**
 
-- `n_lambda_coarse`  
-  Number of coarse grid points for adaptive CV.
+A `data.frame` summarizing results for each CV strategy, including:
 
-- `n_lambda_fine`  
-  Number of fine grid points for adaptive CV.
+- `best_lambda`
+- `best_cvm` (minimum CV deviance)
+- `train_mse`
+- `accuracy`
+- `auc`
+- `stability_sd_best`
+- `stability_mean_sd`
+- `runtime`
 
-- `threshold`  
-  Classification threshold used for accuracy calculation.
-
----
-
-### Output
-
-The function returns a `data.frame` comparing four cross-validation strategies:
-
-- **basic**: standard cross-validation  
-- **warm**: warm-start cross-validation  
-- **adaptive**: coarse-to-fine adaptive search  
-- **official**: `cv.glmnet` baseline  
-
-For each method, the following metrics are reported:
-
-- `best_lambda`  
-- `best_cvm` (minimum cross-validation deviance)  
-- `train_mse`  
-- `accuracy`  
-- `auc`  
-- `stability_sd_best`  
-- `stability_mean_sd`  
-- `runtime` (in seconds)
+This function serves as the main entry point of the package.
 
 ---
 
-## Interpretation of Output
+## Visualization Functions
 
-- The **cross-validation deviance** reflects predictive performance on held-out data.
-- **Accuracy** and **AUC** evaluate classification performance.
-- **Stability metrics** quantify the sensitivity of coefficient estimates across folds.
-- **Runtime** highlights computational efficiency differences among CV strategies.
+### `plot_cv_compare()`
 
-Lower CV error and higher stability indicate more reliable model selection.
+**Description**  
+Plots cross-validation error curves for different CV strategies.
+
+**Purpose**
+
+- Visualize CV error behavior across the regularization path  
+- Compare convergence patterns among methods  
+- Complement numerical results with graphical diagnostics  
+
+### `plot_path()`
+
+**Description**  
+Plots coefficient paths as a function of the regularization parameter `lambda`
+
+**Purpose**
+
+- Visualize coefficient shrinkage under L1 regularization
+- Examine sparsity patterns across lambda values 
+- Assess coefficient stability and interpretability
 
